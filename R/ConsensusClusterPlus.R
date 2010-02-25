@@ -41,7 +41,7 @@ ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, 
   			"seed",if(is.null(seed)) NA else seed))
   	colnames(log) = c("option","value")
   	if(writeTable){
-		write.csv(file=paste(title,"/",".log.csv",sep=""), log,row.names=F)
+		write.csv(file=paste(title,"/",title,".log.csv",sep=""), log,row.names=F)
   	}
   	if(is.null(plot)){
   	    #nothing
@@ -80,16 +80,16 @@ ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, 
 
 	for (tk in 2:maxK){
 		if(verbose){
-		 message("finalCluster")
+		 message(paste("consensus ",tk))
 		}
 		fm = ml[[tk]]
 		hc=hclust( as.dist( 1 - fm ), method=finalLinkage);
-		
+		message("clustered")	
 		ct = cutree(hc,tk)
 		names(ct) = colnames(d)
 		c = fm
-		colnames(c) = colnames(d)
-		rownames(c) = colnames(d)
+		#colnames(c) = colnames(d)
+		#rownames(c) = colnames(d)
 
 		colorList = setClusterColors(res[[tk-1]][[3]],ct,thisPal,colorList)
 	
@@ -110,8 +110,8 @@ ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, 
 	res[[1]] = colorM
 	if(writeTable){
 		for(i in 2:length(res)){
-		 	write.csv(file=paste(title,"/",".k=",i,".consensusMatrix.csv",sep=""), res[[i]]$consensusMatrix)
-			write.table(file=paste(title,"/",".k=",i,".consensusClass.csv",sep=""), res[[i]]$consensusClass,col.names = F,sep=",")
+		 	write.csv(file=paste(title,"/",title,".k=",i,".consensusMatrix.csv",sep=""), res[[i]]$consensusMatrix)
+			write.table(file=paste(title,"/",title,".k=",i,".consensusClass.csv",sep=""), res[[i]]$consensusClass,col.names = F,sep=",")
 		}
 	}
 	return(res)
@@ -195,14 +195,14 @@ calcICL = function(res,title="untitled_consensus_cluster",plot=NULL,writeTable=F
   }
   colnames(cc) = c("k","cluster","clusterConsensus")
   colnames(cci) = c("k","cluster","item","itemConsensus")
-  cci[,"item"] = colnames(res[[2]]$consensusMatrix)[ cci[,"item"] ]
+  cci[,"item"] = names(res[[2]]$consensusClass)[ cci[,"item"] ]
   #type cci
   cci = data.frame( k=as.numeric(cci[,"k"]), cluster=as.numeric(cci[,"cluster"]), item=cci[,"item"], itemConsensus=as.numeric(cci[,"itemConsensus"])) 
   
   #write to file.
   if(writeTable){
-	write.csv(file=paste(title,"/",".summary.cluster.consensus.csv",sep=""),row.names=F, cc)
-	write.csv(file=paste(title,"/",".summary.item.consensus.csv",sep=""), row.names=F, cc)
+	write.csv(file=paste(title,"/",title,".summary.cluster.consensus.csv",sep=""),row.names=F, cc)
+	write.csv(file=paste(title,"/",title,".summary.item.consensus.csv",sep=""), row.names=F, cc)
   }
   return(list(clusterConsensus=cc,itemConsensus=cci))
 }
@@ -226,7 +226,7 @@ ccRun = function(d=d,maxK=NULL,repCount=NULL,pItem=NULL,pFeature=NULL,innerLinka
 		# cluster samples for HC.
 		this_dist = NA
 		if (distance %in% c("pearson","spearman") ){
-		  this_dist = as.dist(1-cor(sample_x[[1]], method=distance))
+		  this_dist = as.dist(1-cor(sample_x[[1]], method=distance, use="complete.obs"))
 		}else if (distance=="euclidean"){
 		  this_dist = dist(t(sample_x[[1]]))
 		}else{
@@ -263,6 +263,8 @@ ccRun = function(d=d,maxK=NULL,repCount=NULL,pItem=NULL,pFeature=NULL,innerLinka
 		}
 
 	}
+	
+
   #consensus fraction
   res = vector(mode="list",maxK)
   for (k in 2:maxK){
@@ -272,6 +274,7 @@ ccRun = function(d=d,maxK=NULL,repCount=NULL,pItem=NULL,pFeature=NULL,innerLinka
     res[[k]] = tmp / tmpCount
     res[[k]][which(tmpCount==0)] = 0
   }
+  message("end fraction")
   return(res)
 }
 
@@ -394,30 +397,31 @@ clusterTrackingPlot = function(m){
 
 triangle = function(m,mode=1){
   #mode=1 for CDF, vector of symmetric matrix.
-  #mode==3 for nonredundant half matrix count.
-  #mode==2 for calcICL
+  #mode==3 for full matrix.
+  #mode==2 for calcICL; nonredundant half matrix coun
   #mode!=1 for summary 
   n=dim(m)[1]
-  nm = matrix(NA,ncol=n,nrow=n)
+  nm = matrix(0,ncol=n,nrow=n)
   fm = m
   vm = vector(mode="numeric",(n*(n-1)/2))
-  k=1
-  for (i in 1:n){
-		for (j in 1:n){
-  		  vm[k]=m[i,j]
-	          nm[i,j] = if (i>j) {m[i,j]} else {NA} #take diagonal out also
-	          if(i>j){
-		          fm[i,j] = m[j,i]
-		  }
-		  k=k+1
-    }
-  }
+  
+  vm = as.vector(m) 
+  nm[upper.tri(nm)] = m[upper.tri(m)] #only upper half
+  
+  fm = t(nm)+nm
+  diag(fm) = 1
+  #add diagnoal
+  
+  nm[upper.tri(nm)] = NA
+  nm[diag(nm)] = 1
+  
+  
   if(mode==1){
-    return(vm) #symmetric matrix with diagonal.
+    return(vm) #vector 		
   }else if(mode==3){
-    return(fm) #return vector
+    return(fm) #return full matrix
   }else if(mode == 2){
-    return(nm) #return symmetric matric w/o diagonal.
+    return(nm) #return lower triangle. no double counts.
   }
 }
 

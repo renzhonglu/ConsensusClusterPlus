@@ -73,6 +73,11 @@ results = ConsensusClusterPlus(d,maxK=6,reps=50,pItem=0.8,pFeature=1,
 title=title,clusterAlg="hc",distance="pearson",seed=1262118388.71279,plot="png")
 @
 
+<<echo=F,results=tex>>=
+cat(sprintf("\\graphicspath{{%s}}", paste(gsub("[\\]","/",title),"/",sep="")))
+cat("\n")
+@
+
 The output of \texttt{ConsensusClusterPlus} is a list, in which the element of the list corresponds to results from the \textit{kth} cluster, for instance, results[[2]] is the results
 result of \textit{k}=2.  The seed option specifies a random number seed and is used here for reproducibility of this tutorial.  These list elements have the following elements:
 <<echo=TRUE>>=
@@ -115,7 +120,7 @@ which can be optionally written to a CSV file depending on the writeTable option
 The first graphic shows the consensus color legend.
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus001.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus001.png}",sep="")
 @
 \\
 The remaining graphics are heatmaps of the consensus matrices for \textit{k} = 2, 3, 4, 5 \cite{monti}.  The consensus matrices have items as both rows and columns, which are microarrays in this .example, and where
@@ -125,20 +130,20 @@ the dendrogram and heatmap according to a legend within the graphic.  This enabl
 consensus.  
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus002.png}",sep="")
-cat("\\includegraphics[width=60mm]{",title,"/consensus003.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus002.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus003.png}",sep="")
 @
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus004.png}",sep="")
-cat("\\includegraphics[width=60mm]{",title,"/consensus005.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus004.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus005.png}",sep="")
 @
 \\
 \subsection{Consensus Cumulative Distribution Function (CDF) Plot}
 This graphic shows the cumulative distribution functions \cite{monti} of the consensus matrix for each \textit{k} (indicated by colors), estimated by a histogram of 100 bins.  This figure allows a user to determine at what number of clusters, \textit{k},  the CDF reaches an approximate maximum, thus consensus and cluster confidence is at a maximum at this \textit{k}.  See \cite{monti} for further details intepretation.
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus007.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus007.png}",sep="")
 @
 \\
 \subsection{CDF Change Plot}
@@ -146,7 +151,7 @@ This graphic shows the relative change in area under the CDF curve \cite{monti} 
 so the total area under the curve rather than the relative increase is plotted. This plot allows a user to determine the relative increase in consensus and determine \textit{k} at which there is no appreciable increase.  See \cite{monti} for intepretation.
 \\ 
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus008.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus008.png}",sep="")
 @
 \\
 \subsection{Tracking Plot}
@@ -157,7 +162,7 @@ Items that change clusters often (changing colors within a column) are indicativ
 suggest an unstable cluster.
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/consensus009.png}",sep="")
+cat("\\includegraphics[width=60mm]{consensus009.png}",sep="")
 @
 \\
 \subsection{Cluster-Consensus Plot}
@@ -168,7 +173,7 @@ High values indicate a cluster has high stability and low values indicate a clus
 mean cluster-consensus among clusters at a given \textit{k} and compare values of clusters across different \textit{k} via the color scheme.
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/icl003.png}",sep="")
+cat("\\includegraphics[width=60mm]{icl003.png}",sep="")
 @
 \\
 \subsection{Item-Consensus Plot}
@@ -178,7 +183,7 @@ the bars, whose color corresponds to the common color scheme.  A bars rectangles
 by increasing value from bottom to top.  The asterisks at the top indicate the consensus cluster for each item.
 \\
 <<echo=F,results=tex>>=
-cat("\\includegraphics[width=60mm]{",title,"/icl001.png}",sep="")
+cat("\\includegraphics[width=60mm]{icl001.png}",sep="")
 @
 \\
 This plot provides a view of item-consensus across all other clusters at a given \textit{k}.  This enables a user to see if a sample is a very "pure" member of a
