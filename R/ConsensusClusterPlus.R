@@ -1,3 +1,10 @@
+###################
+#Summary of changes
+###################
+#0.99.5 - vignette compilation worked in windows.
+#0.99.6 - area under CDF estimation by histogram midpoint; triangle function improvement;
+#
+
 ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, clusterAlg="hc",  title="untitled_consensus_cluster",
 			       innerLinkage="average", finalLinkage="average", distance="pearson", ml=NULL,
 			       tmyPal=NULL,seed=NULL,plot=NULL,writeTable=FALSE,weightsItem=NULL,weightsFeature=NULL,verbose=F){
@@ -238,7 +245,7 @@ ccRun = function(d=d,maxK=NULL,repCount=NULL,pItem=NULL,pFeature=NULL,innerLinka
 		}
 
 		#mCount is possible number of times that two sample occur in same random sample, independent of k
-		mCount = connectivityMatrix(rep(1,length(sample_x[[3]])),mCount, sample_x[[3]] ) #mCount stores number of times a sample pair was picked together.
+		mCount = connectivityMatrix(rep(1,length(sample_x[[3]])),mCount, sample_x[[3]] ) #mCount stores number of times a sample pair was sampled together.
 
 		#use samples for each k		
 		for (k in 2:maxK){
@@ -337,12 +344,12 @@ CDF=function(ml,breaks=100){
   legend(0.8,0.5,legend=paste(rep("",k-1),seq(2,k,by=1),sep=""),fill=this_colors)
 
   #plot area under CDF change.
-  deltaK=areaK[1] #initial point is auc at k=2
+  deltaK=areaK[1] #initial auc at k=2
   for(i in 2:(length(areaK))){
     #proportional increase relative to prior K.
     deltaK = c(deltaK,( areaK[i] - areaK[i-1])/areaK[i-1])
   }
-  plot(1+(1:length(deltaK)),y=deltaK,xlab="k",ylab="relative change in area under CDF curve",main="CDF change",type="l")
+  plot(1+(1:length(deltaK)),y=deltaK,xlab="k",ylab="relative change in area under CDF curve",main="Delta area",type="b")
 }
 
 
@@ -396,33 +403,34 @@ clusterTrackingPlot = function(m){
 }
 
 triangle = function(m,mode=1){
-  #mode=1 for CDF, vector of symmetric matrix.
+  #mode=1 for CDF, vector of lower triangle.
   #mode==3 for full matrix.
   #mode==2 for calcICL; nonredundant half matrix coun
   #mode!=1 for summary 
   n=dim(m)[1]
   nm = matrix(0,ncol=n,nrow=n)
   fm = m
-  vm = vector(mode="numeric",(n*(n-1)/2))
-  
-  vm = as.vector(m) 
+
+
   nm[upper.tri(nm)] = m[upper.tri(m)] #only upper half
   
   fm = t(nm)+nm
-  diag(fm) = 1
-  #add diagnoal
+  diag(fm) = diag(m)
   
+  nm=fm
   nm[upper.tri(nm)] = NA
-  nm[diag(nm)] = 1
-  
+  diag(nm) = NA
+
+  vm = m[lower.tri(nm)]
   
   if(mode==1){
     return(vm) #vector 		
   }else if(mode==3){
     return(fm) #return full matrix
   }else if(mode == 2){
-    return(nm) #return lower triangle. no double counts.
+    return(nm) #returns lower triangle and no diagonal. no double counts.
   }
+  
 }
 
 

@@ -146,7 +146,7 @@ This graphic shows the cumulative distribution functions \cite{monti} of the con
 cat("\\includegraphics[width=60mm]{consensus007.png}",sep="")
 @
 \\
-\subsection{CDF Change Plot}
+\subsection{Delta Area Plot}
 This graphic shows the relative change in area under the CDF curve \cite{monti} comparing \textit{k} and \textit{k} $-$ 1.  For \textit{k} = 2, there is no \textit{k} -1,
 so the total area under the curve rather than the relative increase is plotted. This plot allows a user to determine the relative increase in consensus and determine \textit{k} at which there is no appreciable increase.  See \cite{monti} for intepretation.
 \\ 
@@ -226,10 +226,10 @@ Note: pearson is suggested for heirarchical clustering and euclidean for kmeans.
 
 
 \begin{thebibliography}{}
-\bibitem{monti} Monti, S., Tamayo, P., Mesirov, J., Golub, T. (2003) Consensus Clustering: A Resampling-Based Method for Class Discovery and Visualization of Gene Expression Microarray Data. Machine Learning, 52, 91$-$118.
-\bibitem{hayes} Hayes, D.N, Monti, S., Parmigiani, G. et al. (2006) Gene Expression Profiling Reveals Reproducible Human Lung Adenocarcinoma Subtypes in Multiple Independent Patient Cohorts. Journal of Clinical Oncology, Vol 24, No 31: pp. 5079$-$5090.
-\bibitem{verhaak} Verhaak, R., Hoadley, K., et al. (2010) Integrated genomic analysis identifies clinically relevant subtypes of glioblastoma characterized by abnormalities in PDGFRA, IDH1, EGFR and NF1. Cancer Cell. 17,1-13.
-\bibitem{gp} \texttt{http://www.broadinstitute.org/cancer/software/genepattern/}
+\bibitem{monti}Monti, S., Tamayo, P., Mesirov, J., Golub, T. (2003) Consensus Clustering: A Resampling-Based Method for Class Discovery and Visualization of Gene Expression Microarray Data. Machine Learning, 52, 91$-$118.
+\bibitem{hayes}Hayes, D.N, Monti, S., Parmigiani, G. et al. (2006) Gene Expression Profiling Reveals Reproducible Human Lung Adenocarcinoma Subtypes in Multiple Independent Patient Cohorts. Journal of Clinical Oncology, Vol 24, No 31: pp. 5079$-$5090.
+\bibitem{verhaak}Verhaak, R., Hoadley, K., et al. (2010) Integrated genomic analysis identifies clinically relevant subtypes of glioblastoma characterized by abnormalities in PDGFRA, IDH1, EGFR and NF1. Cancer Cell. 17,1-13.
+\bibitem{gp}\texttt{http://www.broadinstitute.org/cancer/software/genepattern/}
 
 \end{thebibliography} 
 
