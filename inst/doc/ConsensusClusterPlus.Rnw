@@ -13,9 +13,9 @@
 
 \section{Brief description of \textit{Consensus Clustering} }
 \textit{Consensus Clustering} \cite{monti} is a method that provides quantitative evidence for determining the number
- and membership of possible clusters within a dataset, such microarray gene expression.  This method has gained popularity
+ and membership of possible clusters within a dataset, such as microarray gene expression.  This method has gained popularity
  in cancer genomics, where new molecular subclasses of disease have been discovered \cite{hayes,verhaak}.  
- The \textit{Consensus Clustering} method involves subsampling from a set of items, such as microarrays, determines clusterings of specified cluster counts (\textit{k}).  Then, pairwise \textit{consensus} values, the proportion that two items occupied the same cluster out of the number of 
+ The \textit{Consensus Clustering} method involves subsampling from a set of items, such as microarrays, and determines clusterings of specified cluster counts (\textit{k}).  Then, pairwise \textit{consensus} values, the proportion that two items occupied the same cluster out of the number of 
 times they occurred in the same subsample, are calculated and stored in a symmetrical \textit{consensus matrix} for each \textit{k}.  
 The \textit{consensus matrix} is summarized in several graphical summaries that enable a user to decide upon a reasonable cluster number and membership.  
 A web-based version of \textit{Consensus Clustering} is publicly available \cite{gp}.  For a formal description, see \cite{monti}.
@@ -29,7 +29,7 @@ There are three main steps to use \texttt{ConsensusClusterPlus}: preparing input
 
 
 \subsection{Preparing input data}
-The first step is to gather some data for cluster analysis. This data could be the result of an experiment such as a mRNA expression microarray or
+The first step is to gather some data for cluster analysis. These data could be the result of an experiment such as a mRNA expression microarray or
 immunohistochemical staining intensities.  The input data format is a matrix where columns are samples (items), rows are features and cells are numerical values.
 For this tutorial, we use the ALL gene expression data from the ALL library.  You can see the matrix d is already in the proper format.  The column and row names, which 
 correspond to the sample and gene names, will be maintained in the output.
@@ -125,7 +125,7 @@ cat("\\includegraphics[width=60mm]{consensus001.png}",sep="")
 \\
 The remaining graphics are heatmaps of the consensus matrices for \textit{k} = 2, 3, 4, 5 \cite{monti}.  The consensus matrices have items as both rows and columns, which are microarrays in this .example, and where
 consensus values range from 0 (never clustered together) to 1 (always clustered together) marked by white to dark blue.  The consensus matrices are
-ordered by the consensus clustering which is depicted as a dendrogram atop the heatmap.  To aid analysis, the cluster membership are marked by colored rectangles between
+ordered by the consensus clustering which is depicted as a dendrogram atop the heatmap.  To aid analysis, the cluster memberships are marked by colored rectangles between
 the dendrogram and heatmap according to a legend within the graphic.  This enables a user to compare a clusters' member count in the context of their
 consensus.  
 \\
@@ -178,8 +178,8 @@ cat("\\includegraphics[width=60mm]{icl003.png}",sep="")
 \\
 \subsection{Item-Consensus Plot}
 \textit{Item-consensus} values are the mean consensus of an item with all items in a particular cluster.  An item has \textit{k} item-consensus values corresponding to each cluster
-at a particular \textit{k}.  These values are depicted in barplots for each \textit{k}.  Samples are stacked bars.  \textit{Item-consensus} values are indicatged by the heights of the colored portion of 
-the bars, whose color corresponds to the common color scheme.  A bars rectangles are ordered
+at a particular \textit{k}.  These values are depicted in barplots for each \textit{k}.  Samples are stacked bars.  \textit{Item-consensus} values are indicated by the heights of the colored portion of 
+the bars, whose color corresponds to the common color scheme.  Bars' rectangles are ordered
 by increasing value from bottom to top.  The asterisks at the top indicate the consensus cluster for each item.
 \\
 <<echo=F,results=tex>>=
@@ -187,7 +187,7 @@ cat("\\includegraphics[width=60mm]{icl001.png}",sep="")
 @
 \\
 This plot provides a view of item-consensus across all other clusters at a given \textit{k}.  This enables a user to see if a sample is a very "pure" member of a
-cluster or if it share high consensus to multiple clusters (large rectangles in a column of multiple colors), suggesting that it is an unstable or "unpure" member.  These values could be used to
+cluster or if it shares high consensus to multiple clusters (large rectangles in a column of multiple colors), suggesting that it is an unstable or "unpure" member.  These values could be used to
 select "core" samples similar to \cite{verhaak} that are highly representative of a cluster.  Further, this plot can aid cluster number decisions.  For instance, if a cluster
 consists mainly of members with very "unpure" items, then this evidence could be used to support a maximum cluster number at 1 below this \textit{k} or this evidence
 could support that this cluster is an outlier cluster.  Decisions such as these are best to be made by the user in conjunction with other evidence such as consensus matrices, tracking plots, etc.
@@ -227,7 +227,7 @@ Note: pearson is suggested for heirarchical clustering and euclidean for kmeans.
 
 \begin{thebibliography}{}
 \bibitem{monti}Monti, S., Tamayo, P., Mesirov, J., Golub, T. (2003) Consensus Clustering: A Resampling-Based Method for Class Discovery and Visualization of Gene Expression Microarray Data. Machine Learning, 52, 91$-$118.
-\bibitem{hayes}Hayes, D.N, Monti, S., Parmigiani, G. et al. (2006) Gene Expression Profiling Reveals Reproducible Human Lung Adenocarcinoma Subtypes in Multiple Independent Patient Cohorts. Journal of Clinical Oncology, Vol 24, No 31: pp. 5079$-$5090.
+\bibitem{hayes}Hayes, D.N, Monti, S., Parmigiani, G. et al. (2006) Gene Expression Profiling Reveals Reproducible Human Lung Adenocarcinoma Subtypes in Multiple Independent Patient Cohorts. Journal of Clinical Oncology, 24 (31) 5079$-$5090.
 \bibitem{verhaak}Verhaak, R., Hoadley, K., et al. (2010) Integrated genomic analysis identifies clinically relevant subtypes of glioblastoma characterized by abnormalities in PDGFRA, IDH1, EGFR and NF1. Cancer Cell. 17,1-13.
 \bibitem{gp}\texttt{http://www.broadinstitute.org/cancer/software/genepattern/}
 
