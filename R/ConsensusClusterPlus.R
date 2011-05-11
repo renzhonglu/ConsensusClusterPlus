@@ -70,7 +70,14 @@ ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, 
 					"#f4cced", #pink,
 					"#f4cc03", #lightorange
 					"#05188a", #navy,
-					"#e5a25a" #light brown
+					"#e5a25a", #light brown
+					"#06f106", #bright green
+					"#85848f", #med gray
+					"#000000", #black
+					"#076f25", #dark green
+					"#93cd7f",#lime green
+					"#4d0776", #dark purple
+					"#ffffff" #white
 			)
 
 	#plot scale
@@ -101,9 +108,10 @@ ConsensusClusterPlus=function(d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, 
 		colorList = setClusterColors(res[[tk-1]][[3]],ct,thisPal,colorList)
 	
 		pc = c
-		pc=pc[hc$order,] #***pc is matrix for plotting, same as c but is reordered and has names.
+		pc=pc[hc$order,] #***pc is matrix for plotting, same as c but is row-ordered and has names and extra row of zeros.
+		pc = rbind(pc,0)
 
-		heatmap(pc, Colv=as.dendrogram(hc), Rowv=NA, symm=TRUE, scale='none', col=tmyPal, na.rm=TRUE,labRow=F,labCol=F,mar=c(5,5),main=paste("consensus matrix k=",tk,sep="") , ColSideCol=colorList[[1]])
+		heatmap(pc, Colv=as.dendrogram(hc), Rowv=NA, symm=FALSE, scale='none', col=tmyPal, na.rm=TRUE,labRow=F,labCol=F,mar=c(5,5),main=paste("consensus matrix k=",tk,sep="") , ColSideCol=colorList[[1]])
 		legend("topright",legend=unique(ct),fill=unique(colorList[[1]]),horiz=FALSE )
 
 		res[[tk]] = list(consensusMatrix=c,consensusTree=hc,consensusClass=ct,ml=ml[[tk]],clrs=colorList)
@@ -161,7 +169,7 @@ calcICL = function(res,title="untitled_consensus_cluster",plot=NULL,writeTable=F
 	
       for (ei in rev(res[[2]]$consensusTree$order) ){
 		denom = if (ei %in% items) { nk - 1} else { nk }
-        	mei = sum( m[ei,items], na.rm=T)/denom  # mean item consensus to a cluster.
+        	mei = sum( c(m[ei,items],m[items,ei]), na.rm=T)/denom  # mean item consensus to a cluster.
 		cci = rbind(cci,c(k,ci,ei,mei)) #cluster, cluster index, item index, item-consensus
       }
       eiCols = c(eiCols, rep(ci,length(o$consensusClass)) )
@@ -170,7 +178,7 @@ calcICL = function(res,title="untitled_consensus_cluster",plot=NULL,writeTable=F
 	  cck = cci[which(cci[,1]==k),] #only plot the new k data.
 
 	  #group by item, order by cluster i
-	  w=lapply(split(cck,cck[,3]), function(x) { y=matrix(unlist(x),ncol=4); y[order(y[,2]),4] }) #note is this right ****, matrix by row?
+	  w=lapply(split(cck,cck[,3]), function(x) { y=matrix(unlist(x),ncol=4); y[order(y[,2]),4] }) 
 	  q = matrix(as.numeric(unlist(w)),ncol=length(w),byrow=F)
 	  q = q[,res[[2]]$consensusTree$order] #order by leave order of k=2
  	  #q is a matrix of k rows and sample columns, values are item consensus of sample to the cluster.
@@ -321,7 +329,7 @@ sampleCols = function(d,pSamp=NULL,pRow=NULL,weightsItem=NULL,weightsFeature=NUL
 
 CDF=function(ml,breaks=100){
   #plot CDF distribution
-  plot(c(0),xlim=c(0,1),ylim=c(0,1),col="white",bg="white",xlab="consensus index",ylab="CDF",main="consensus CDF")
+  plot(c(0),xlim=c(0,1),ylim=c(0,1),col="white",bg="white",xlab="consensus index",ylab="CDF",main="consensus CDF", las=2)
   k=length(ml)
   this_colors = rainbow(k-1)
   areaK = c()
@@ -420,7 +428,6 @@ triangle = function(m,mode=1){
   nm=fm
   nm[upper.tri(nm)] = NA
   diag(nm) = NA
-
   vm = m[lower.tri(nm)]
   
   if(mode==1){
@@ -437,20 +444,22 @@ triangle = function(m,mode=1){
 rankedBarPlot=function(d,myc,cc,title){
 	colors = rbind() #each row is a barplot series
 	byRank = cbind()
-	maxH = 1.5 #maximum height of graph
+
 	spaceh = 0.1 #space between bars
 	for(i in 1:ncol(d)){
 	  byRank = cbind(byRank,sort(d[,i],na.last=F))
 	  colors = rbind(colors,order(d[,i],na.last=F))
 	}
+	maxH = max(c(1.5,apply(byRank,2,sum)),na.rm=T) #maximum height of graph
+	
 	#barplot largest to smallest so that smallest is in front.
-	barp = barplot( apply(byRank,2,sum) ,  col=myc[colors[,1]] ,space=spaceh,ylim=c(0,max(maxH,apply(byRank,2,sum),na.rm=T)),main=paste("item-consensus", title),border=NA,las=1  )
+	barp = barplot( apply(byRank,2,sum) ,  col=myc[colors[,1]] ,space=spaceh,ylim=c(0,maxH),main=paste("item-consensus", title),border=NA,las=1  )
 	for(i in 2:nrow(byRank)){
-	  barplot( apply(matrix(byRank[i:nrow(byRank),],ncol=ncol(byRank))  ,2,sum), space=spaceh,col=myc[colors[,i]],add=T,border=NA,las=1  )
+	  barplot( apply(matrix(byRank[i:nrow(byRank),],ncol=ncol(byRank))  ,2,sum), space=spaceh,col=myc[colors[,i]],ylim=c(0,maxH), add=T,border=NA,las=1  )
 	}
 	xr=seq(spaceh,ncol(d)+ncol(d)*spaceh,(ncol(d)+ncol(d)*spaceh)/ncol(d)  )
 	#class labels as asterisks
-	text("*",x=xr+0.5,y=1.4,col=myc[cc],cex=1.4) #rect(xr,1.4,xr+1,1.5,col=myc[cc] )
+	text("*",x=xr+0.5,y=maxH,col=myc[cc],cex=1.4) #rect(xr,1.4,xr+1,1.5,col=myc[cc] )
 }
 
 

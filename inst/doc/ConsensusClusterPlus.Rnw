@@ -233,4 +233,13 @@ Note: pearson is suggested for heirarchical clustering and euclidean for kmeans.
 
 \end{thebibliography} 
 
+\subsection{Changes}
+\begin{itemize}
+
+\item Version 1.0.1.  Item-consensus calculation was corrected.  Consensus matric heat maps are now guaranteed to correspond to the scale.
+\item Version 1.5.1.  Version 1.0.1 changes were re-incorporated into Bioc 2.9, 2.8.  Version 1.0.1 was part of Bioc 2.6, but not part of Bioc 2.7.  
+
+\end{itemize}
+
+
 \end{document}
