@@ -2,7 +2,7 @@ Package: ConsensusClusterPlus
 Type: Package
 Imports: Biobase, ALL, graphics, stats, utils
 Title: ConsensusClusterPlus
-Version: 1.9.0
+Version: 1.10.0
 Date: 2011-5-11
 Author: Matt Wilkerson
 Maintainer: Matt Wilkerson <mwilkers@med.unc.edu>
