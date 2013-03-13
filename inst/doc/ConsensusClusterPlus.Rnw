@@ -17,12 +17,13 @@
  in cancer genomics, where new molecular subclasses of disease have been discovered \cite{hayes,verhaak}.  
  The \textit{Consensus Clustering} method involves subsampling from a set of items, such as microarrays, and determines clusterings of specified cluster counts (\textit{k}).  Then, pairwise \textit{consensus} values, the proportion that two items occupied the same cluster out of the number of 
 times they occurred in the same subsample, are calculated and stored in a symmetrical \textit{consensus matrix} for each \textit{k}.  
-The \textit{consensus matrix} is summarized in several graphical summaries that enable a user to decide upon a reasonable cluster number and membership.  
+The \textit{consensus matrix} is summarized in several graphical displays that enable a user to decide upon a reasonable cluster number and membership.  
 A web-based version of \textit{Consensus Clustering} is publicly available \cite{gp}.  For a formal description, see \cite{monti}.
 \\
 \\
-\texttt{ConsensusClusterPlus} implements the \textit{Consensus Clustering} method in \textit{R} and extends it with
+\texttt{ConsensusClusterPlus}\cite{wilkerson} implements the \textit{Consensus Clustering} method in \textit{R} and extends it with
 new features and graphical outputs that can aid users in class discovery.
+
 
 \section{Tutorial}
 There are three main steps to use \texttt{ConsensusClusterPlus}: preparing input data, running the program, and generating cluster-consensus and item-consensus.
@@ -95,6 +96,8 @@ results[[2]][["consensusClass"]][1:5]
 #clrs - colors for cluster  
 @
 
+See additional options section for further description of clustering algorithms and distance metrics.
+
 \subsection{Generating cluster and item consensus}
 After executing \texttt{ConsensusClusterPlus}, one can optionally calculate cluster-consensus and item-consensus results by:
 
@@ -113,8 +116,8 @@ icl[["itemConsensus"]][1:5,]
 
 
 \section{Graphic Output Description}
-The output of \texttt{ConsensusClusterPlus} consists of graphics, which are written to the screen, pdf file, or png files depending on the plot option; and numerical data 
-which can be optionally written to a CSV file depending on the writeTable option.
+The output of \texttt{ConsensusClusterPlus} consists of graphics, which are written to the screen, 'pdf' file, or 'png' files depending on the plot option; and numerical data 
+which can be optionally written to a CSV file depending on the writeTable option.  For large datasets, graphical displays can be quite large and plotting the consensus dendrogram above the consensus matrices may not be possible.  If your dataset is large, the plot option 'pngBMP' which does not produce the consensus matrix dendrogram and uses the bitmap function rather png.  Bitmap is often available natively on linux systems but can potentially be installed on other systems.
 
 \subsection{Consensus Matrices}
 The first graphic shows the consensus color legend.
@@ -123,7 +126,7 @@ The first graphic shows the consensus color legend.
 cat("\\includegraphics[width=60mm]{consensus001.png}",sep="")
 @
 \\
-The remaining graphics are heatmaps of the consensus matrices for \textit{k} = 2, 3, 4, 5 \cite{monti}.  The consensus matrices have items as both rows and columns, which are microarrays in this .example, and where
+The remaining graphics are heatmaps of the consensus matrices for \textit{k} = 2, 3, 4, 5 \cite{monti}.  The consensus matrices have items as both rows and columns, which are microarrays in this example, and where
 consensus values range from 0 (never clustered together) to 1 (always clustered together) marked by white to dark blue.  The consensus matrices are
 ordered by the consensus clustering which is depicted as a dendrogram atop the heatmap.  To aid analysis, the cluster memberships are marked by colored rectangles between
 the dendrogram and heatmap according to a legend within the graphic.  This enables a user to compare a clusters' member count in the context of their
@@ -193,14 +196,23 @@ consists mainly of members with very "unpure" items, then this evidence could be
 could support that this cluster is an outlier cluster.  Decisions such as these are best to be made by the user in conjunction with other evidence such as consensus matrices, tracking plots, etc.
 \\
 \\
-\subsection{Additional options for \texttt{ConsensusClusterPlus} function}
+\subsection{Additional details on options for \texttt{ConsensusClusterPlus} function}
 
 \begin{itemize}
-
-\item \textbf{clusterAlg} This option specifies the type of clustering algorithm to use: "hc" for heirarchical clustering, and "km" for kmeans.  Alternatively, one can
-supply their own clustering hook, which should accept a distance matrix and a cluster number as its arguments and returns vector of cluster assignments having the same order as the distance matrix columns.
-For .example, this simple function executes divisive clustering using the diana function from the cluster package and returns the expected object.  The last line shows an .example of how this could be used.
-
+\item \textbf{d} This option specifies the data to be used in ConsensusClusterPlus.  This is typically a matrix of numerical expression values, of which an example is provided in the Running ConsensusClusterPlus section of this document.  When provided with a data matrix as d, ConsensusClusterPlus recalculates a distance matrix during each iteration.  This recalculation is required if feature resampling is specified (pFeature less than 1).  However with very large datasets (1,000's of items) and no feature resampling, this process can be time consuming and unnecessary.  Alternatively, a pre-computed distance matrix can be provided as d, resulting in faster computation.  An example of using a dist object as input follow below.
+<<>>=
+#example of providing a custom distance matrix as input:
+#dt = as.dist(1-cor(d,method="pearson"))
+#ConsensusClusterPlus(dt,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example2",distance="pearson",clusterAlg="hc")
+@
+\item \textbf{distance}This option describes the distance metric to be used.  A character value of one of the following metrics is accepted: pearson for (1 - Pearson correlation), spearman for (1 - Spearman correlation), euclidean, binary, maximum, canberra, minkowski.  Alternatively a custom distance function cab be supplied for this argument, which accepts a numerical matrix (items as rows and features as columns) as input and returns a dist object.  
+<<>>=
+#example of providing a custom distance function:
+#myDistFunc = function(x){ dist(x,method="manhattan")}
+#ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example3",distance="myDistFunc",clusterAlg="pam")
+@
+\item \textbf{clusterAlg} This option specifies the type of clustering algorithm to use: "hc" for heirarchical clustering, "pam" for partioning around medoids, "km" for kmeans.  Alternatively, one can supply their own clustering function, which should accept a distance matrix and a cluster number as its arguments and returns vector of cluster assignments having the same order as the distance matrix columns.
+For example, this simple function executes divisive clustering using the diana function from the cluster package and returns the expected object.  The last line shows an example of how this could be used.
 <<>>=
 #library(cluster)
 #dianaHook = function(this_dist,k){
@@ -209,36 +221,34 @@ For .example, this simple function executes divisive clustering using the diana 
   #return(assignment)  
 #}
 #ConsensusClusterPlus(d,clusterAlg="dianaHook",distance="pearson",...)
-TRUE
 @
-
+\item \textbf{update on kmeans options} "km" option performs kmeans clustering directly on a data matrix, with items and features resampled.  "kmdist" performs kmeans clustering on a distance matrix calcualted from the resampled data.  In  versions prior to 1.11.1, the "km" option refers to kmdist.  Users wishing to use this kmeans invocation in versions 1.11.1 or later should use option kmdist.
 \item \textbf{innerLinkage} This option specifies the linkage method to use in iterative agglomerative heirarchical clustering.  Not applicable to other cluster algorithms.
 \item \textbf{finalLinkage} This option specifies the linkage method to use in the final agglomerative heirarchical clustering.
 \item \textbf{distance} This option specifies the distance metric to use: "pearson" for 1-Pearson correlation coefficient, "spearman" for 1-Spearman correlation coefficient, "euclidean" for Euclidean distance.
-Note: pearson is suggested for heirarchical clustering and euclidean for kmeans.
 \item \textbf{tmyPal} character vector of ordered colors to use for consensus matrix.  If not specified, a series of white to blue colors is used.
 \item \textbf{writeTable} boolean. If TRUE, write consensus matrices, ICL, and log to file.  
-\item \textbf{weightsFeature} numerical vector of weights for sampling features.  See help(sample) for further details. 
-\item \textbf{weightsItem} numerical vector of weights for sampling items.  See help(sample) for further details.
+\item \textbf{weightsFeature} numerical vector of weights for sampling features.  See help for further details. 
+\item \textbf{weightsItem} numerical vector of weights for sampling items.  See help for further details.
 \item \textbf{verbose} boolean.  If TRUE, print messages to the screen to indicate progress.  This is useful for large datasets.
-
 \end{itemize}
 
 
 \begin{thebibliography}{}
 \bibitem{monti}Monti, S., Tamayo, P., Mesirov, J., Golub, T. (2003) Consensus Clustering: A Resampling-Based Method for Class Discovery and Visualization of Gene Expression Microarray Data. Machine Learning, 52, 91$-$118.
+\bibitem{wilkerson}Wilkerson, M.D., Hayes, D.N. (2010). ConsensusClusterPlus: a class discovery tool with confidence assessments and item tracking. Bioinformatics, 2010 Jun 15;26(12):1572$-$3. 
 \bibitem{hayes}Hayes, D.N, Monti, S., Parmigiani, G. et al. (2006) Gene Expression Profiling Reveals Reproducible Human Lung Adenocarcinoma Subtypes in Multiple Independent Patient Cohorts. Journal of Clinical Oncology, 24 (31) 5079$-$5090.
 \bibitem{verhaak}Verhaak, R., Hoadley, K., et al. (2010) Integrated genomic analysis identifies clinically relevant subtypes of glioblastoma characterized by abnormalities in PDGFRA, IDH1, EGFR and NF1. Cancer Cell. 17,1-13.
+
 \bibitem{gp}\texttt{http://www.broadinstitute.org/cancer/software/genepattern/}
 
 \end{thebibliography} 
 
 \subsection{Changes}
 \begin{itemize}
-
 \item Version 1.0.1.  Item-consensus calculation was corrected.  Consensus matric heat maps are now guaranteed to correspond to the scale.
 \item Version 1.5.1.  Version 1.0.1 changes were re-incorporated into Bioc 2.9, 2.8.  Version 1.0.1 was part of Bioc 2.6, but not part of Bioc 2.7.  
-
+\item Version 1.11.1. For large datasets, the input data (d) was modified to also accept a distance matrix which reduces computation time, and plotBMP was added a plot type so that large consensus matrices can be plotted. Internal data structures were modified to increase speed.  Distance metric options expanded ("maximum", "manhattan", "canberra", "binary","minkowski" from dist) and custom distance function option added.  Partitioning Around Mediods clustering (from cluster package) was added as a clustering algorithm.  Kmeans invocation was changed to run on the data matrix by default.  Kmeans invocation on a distance matrix is now possible by kmdist.  
 \end{itemize}
 
 

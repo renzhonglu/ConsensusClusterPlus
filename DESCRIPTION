@@ -1,10 +1,10 @@
 Package: ConsensusClusterPlus
 Type: Package
-Imports: Biobase, ALL, graphics, stats, utils
+Imports: Biobase, ALL, graphics, stats, utils, cluster
 Title: ConsensusClusterPlus
-Version: 1.11.0
-Date: 2011-5-11
-Author: Matt Wilkerson
+Version: 1.11.1
+Date: 2013-2-27
+Author: Matt Wilkerson <mwilkers@med.unc.edu>, Peter Waltman <waltman@soe.ucsc.edu>
 Maintainer: Matt Wilkerson <mwilkers@med.unc.edu>
 Description: algorithm for determining cluster count and membership by stability evidence in unsupervised analysis
 License: GPL version 2

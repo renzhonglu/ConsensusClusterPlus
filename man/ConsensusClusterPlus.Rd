@@ -10,30 +10,31 @@
 ConsensusClusterPlus(
 d=NULL, maxK = 3, reps=10, pItem=0.8, pFeature=1, clusterAlg="hc",title="untitled_consensus_cluster",
 innerLinkage="average", finalLinkage="average", distance="pearson", ml=NULL,
-tmyPal=NULL,seed=NULL,plot=NULL,writeTable=FALSE,weightsItem=NULL,weightsFeature=NULL,verbose=F)
+tmyPal=NULL,seed=NULL,plot=NULL,writeTable=FALSE,weightsItem=NULL,weightsFeature=NULL,verbose=F,corUse="everything")
 
 calcICL(res,title="untitled_consensus_cluster",plot=NULL,writeTable=FALSE)
 }
 \arguments{
-  \item{d}{matrix where columns=items/samples and rows are features.  For example, a gene expression matrix of genes in rows and microarrays in columns. OR ExpressionSet object.}
+  \item{d}{data to be clustered; either a data matrix where columns=items/samples and rows are features.  For example, a gene expression matrix of genes in rows and microarrays in columns, or ExpressionSet object, or a distance object (only for cases of no feature resampling) }
   \item{maxK}{integer value. maximum cluster number to evaluate.  }
   \item{reps}{integer value. number of subsamples.  }
   \item{pItem}{numerical value. proportion of items to sample.  }
   \item{pFeature}{numerical value. proportion of features to sample.  }
-  \item{clusterAlg}{character value. cluster algorithm.  "hc" heirarchical (hclust) or "km" for k-means.  See Note. }
+  \item{clusterAlg}{character value. cluster algorithm.  'hc' heirarchical (hclust), 'pam' for paritioning around medoids, 'km' for k-means upon data matrix, 'kmdist' for k-means upon distance matrices (former km option), or a function that returns a clustering.  See example and vignette for more details. }
   \item{title}{ character value for output directory. Directory is created only if plot is not NULL or writeTable is TRUE. This title can be an abosulte or relative path.  }
   \item{innerLinkage}{heirarchical linkage method for subsampling. }
   \item{finalLinkage}{heirarchical linkage method for consensus matrix. }
-  \item{distance}{character value. sample distance measures: "pearson","spearman", or "euclidean". }
+  \item{distance}{character value. 'pearson': (1 - Pearson correlation), 'spearman' (1 - Spearman correlation), 'euclidean', 'binary', 'maximum', 'canberra', 'minkowski" or custom distance function.   }
   \item{ml}{optional. prior result, if supplied then only do graphics and tables.}
   \item{tmyPal}{optional character vector of colors for consensus matrix}
   \item{seed}{optional numerical value.  sets random seed for reproducible results.}
-  \item{plot}{character value. NULL - print to screen, 'pdf', 'png'.}
+  \item{plot}{character value. NULL - print to screen, 'pdf', 'png', 'pngBMP' for bitmap png, helpful for large datasets.}
   \item{writeTable}{logical value. TRUE - write ouput and log to csv.}
   \item{weightsItem}{optional numerical vector. weights to be used for sampling items.}
   \item{weightsFeature}{optional numerical vector. weights to be used for sampling features.}
   \item{res}{ result of consensusClusterPlus.}
   \item{verbose}{ boolean. If TRUE, print messages to the screen to indicate progress.  This is useful for large datasets.}
+  \item{corUse}{optional character value.  specifies how to handle missing data in correlation distances 'everything','pairwise.complete.obs', 'complete.obs' see cor() for description.}
 }
 \details{
 ConsensusClusterPlus implements the Consensus Clustering algorithm of Monti, et al (2003) and extends this method with new functionality and visualizations.
@@ -52,7 +53,10 @@ calcICL returns a list of two elements clusterConsensus and itemConsensus corres
 
 }
 
-\author{ Matt Wilkerson mwilkers@med.unc.edu }
+\author{ Matt Wilkerson mwilkers@med.unc.edu
+
+Peter Waltman waltman@soe.ucsc.edu
+ }
 
 \references{
 Monti, S., Tamayo, P., Mesirov, J., Golub, T. (2003) Consensus Clustering:
@@ -62,27 +66,46 @@ Expression Microarray Data. Machine Learning, 52, 91-118.
 
 \examples{
 
-## obtain gene expression data
+# obtain gene expression data
 library(Biobase)
 data(geneData)
 d=geneData
 #median center genes
-d = sweep(d,1, apply(d,1,median))
+dc = sweep(d,1, apply(d,1,median))
 
-## run consensus cluster
-rcc = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example")
+# run consensus cluster, with standard options
+rcc = ConsensusClusterPlus(dc,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example",distance="pearson",clusterAlg="hc")
+
+# same as above but with pre-computed distance matrix, useful for large datasets (>1,000's of items)
+dt = as.dist(1-cor(dc,method="pearson"))
+rcc2 = ConsensusClusterPlus(dt,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example2",distance="pearson",clusterAlg="hc")
+
+# k-means clustering
+rcc3 = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example3",distance="euclidean",clusterAlg="km")
+
+
+### partition around medoids clustering with manhattan distance
+rcc4 = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example3",distance="manhattan",clusterAlg="pam")
+
+## example of custom distance function as hook:
+myDistFunc = function(x){ dist(x,method="manhattan")}
+rcc5 = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="example3",distance="myDistFunc",clusterAlg="pam")
+
+
+##example of clusterAlg as hook:
+#library(cluster)
+dianaHook = function(this_dist,k){
+  tmp = diana(this_dist,diss=TRUE)
+  assignment = cutree(tmp,k)
+  return(assignment)  
+}
+rcc6 = ConsensusClusterPlus(d,maxK=6,reps=25,pItem=0.8,pFeature=1,title="example",clusterAlg="dianaHook")
+
+
+
 
 ## ICL
 resICL = calcICL(rcc,title="example")
-
-##example of programming hook for clusterAlg:
-#library(cluster)
-#dianaHook = function(this_dist,k){
-  #tmp = diana(this_dist,diss=TRUE)
-  #assignment = cutree(tmp,k)
-  #return(assignment)  
-#}
-#ConsensusClusterPlus(d,maxK=6,reps=25,pItem=0.8,pFeature=1,title="example",plot="png",clusterAlg="dianaHook")
 
 
 }
