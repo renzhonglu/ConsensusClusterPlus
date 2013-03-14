@@ -93,7 +93,7 @@ rcc5 = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="exampl
 
 
 ##example of clusterAlg as hook:
-#library(cluster)
+library(cluster)
 dianaHook = function(this_dist,k){
   tmp = diana(this_dist,diss=TRUE)
   assignment = cutree(tmp,k)
