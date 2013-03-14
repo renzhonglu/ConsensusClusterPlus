@@ -16,7 +16,7 @@ ConsensusClusterPlus <- function( d=NULL,
                                   weightsItem=NULL,
                                   weightsFeature=NULL,
                                   verbose=F,
-				  corUse="pairwise.complete.obs" ) {
+				  corUse="everything" ) {
   ##description: runs consensus subsamples 
   if(is.null(seed)==TRUE){
     seed=timeSeed = as.numeric(Sys.time())

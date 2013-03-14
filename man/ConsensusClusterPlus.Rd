@@ -93,13 +93,13 @@ rcc5 = ConsensusClusterPlus(d,maxK=4,reps=100,pItem=0.8,pFeature=1,title="exampl
 
 
 ##example of clusterAlg as hook:
-library(cluster)
-dianaHook = function(this_dist,k){
-  tmp = diana(this_dist,diss=TRUE)
-  assignment = cutree(tmp,k)
-  return(assignment)  
-}
-rcc6 = ConsensusClusterPlus(d,maxK=6,reps=25,pItem=0.8,pFeature=1,title="example",clusterAlg="dianaHook")
+#library(cluster)
+#dianaHook = function(this_dist,k){
+#  tmp = diana(this_dist,diss=TRUE)
+#  assignment = cutree(tmp,k)
+#  return(assignment)  
+#}
+#rcc6 = ConsensusClusterPlus(d,maxK=6,reps=25,pItem=0.8,pFeature=1,title="example",clusterAlg="dianaHook")
 
 
 
