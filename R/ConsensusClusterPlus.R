@@ -43,7 +43,7 @@ ConsensusClusterPlus <- function( d=NULL,
       }
       
       if ( ( ! is.null( pFeature ) ) && ( pFeature < 1 ) ) {
-        messsage( "Cannot use the pFeatures parameter when specifying a distance matrix as the data object\n" )
+        message( "Cannot use the pFeatures parameter when specifying a distance matrix as the data object\n" )
         pFeature <- 1
       }
       if ( ! is.null( weightsFeature ) ) {
