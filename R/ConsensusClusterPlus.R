@@ -395,7 +395,11 @@ ccRun <- function( d=d,
 	if( ( class(try(get(distance),silent=T))=="function") ){
           this_dist <- get(distance)( t( sample_x$submat ) )
 	}else{
-          this_dist <- dist( t( sample_x$submat ), method= distance  )
+	  if( distance == "pearson" | distance == "spearman"){
+            this_dist <- as.dist( 1-cor(sample_x$submat,use=corUse,method=distance) )
+	  }else{
+            this_dist <- dist( t( sample_x$submat ), method= distance  )
+	  }
 	}
         attr( this_dist, "method" ) <- distance  
       } else {
